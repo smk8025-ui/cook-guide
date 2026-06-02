@@ -1,13 +1,16 @@
-import { NextResponse } from "next/server";
-import { prisma } from "../../../../lib/db";
-import { verifyPassword, createSession } from "../../../../lib/auth";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { verifyPassword, signToken } from "@/lib/auth";
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { username, password } = await request.json();
+    const { username, password } = await req.json();
 
     if (!username || !password) {
-      return NextResponse.json({ error: "아이디와 비밀번호를 모두 입력해주세요." }, { status: 400 });
+      return NextResponse.json(
+        { error: "아이디와 비밀번호를 모두 입력해 주세요." },
+        { status: 400 }
+      );
     }
 
     // Find user
@@ -15,22 +18,44 @@ export async function POST(request: Request) {
       where: { username },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: "아이디 또는 비밀번호가 틀렸습니다." }, { status: 400 });
+    if (!user || !verifyPassword(password, user.password)) {
+      return NextResponse.json(
+        { error: "아이디 또는 비밀번호가 틀렸습니다." },
+        { status: 401 }
+      );
     }
 
-    // Verify password
-    const isPasswordValid = await verifyPassword(password, user.passwordHash);
-    if (!isPasswordValid) {
-      return NextResponse.json({ error: "아이디 또는 비밀번호가 틀렸습니다." }, { status: 400 });
-    }
+    // Sign JWT
+    const token = signToken({
+      userId: user.id,
+      username: user.username,
+    });
 
-    // Create session cookie
-    await createSession(user.id, user.username);
+    // Set cookie
+    const response = NextResponse.json({
+      message: "로그인에 성공했습니다.",
+      user: {
+        id: user.id,
+        username: user.username,
+      },
+    });
 
-    return NextResponse.json({ success: true, user: { id: user.id, username: user.username } });
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json({ error: "로그인 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json(
+      { error: "로그인 처리 중 서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
   }
 }

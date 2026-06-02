@@ -1,0 +1,444 @@
+{
+  "users": [],
+  "ingredients": [
+    {
+      "id": 1,
+      "name": "계란",
+      "category": "단백질"
+    },
+    {
+      "id": 2,
+      "name": "양파",
+      "category": "채소"
+    },
+    {
+      "id": 3,
+      "name": "당근",
+      "category": "채소"
+    },
+    {
+      "id": 4,
+      "name": "김치",
+      "category": "반찬"
+    },
+    {
+      "id": 5,
+      "name": "두부",
+      "category": "단백질"
+    },
+    {
+      "id": 6,
+      "name": "감자",
+      "category": "채소"
+    },
+    {
+      "id": 7,
+      "name": "대파",
+      "category": "채소"
+    },
+    {
+      "id": 8,
+      "name": "된장",
+      "category": "양념"
+    },
+    {
+      "id": 9,
+      "name": "돼지고기",
+      "category": "단백질"
+    },
+    {
+      "id": 10,
+      "name": "밥",
+      "category": "곡류"
+    },
+    {
+      "id": 11,
+      "name": "간장",
+      "category": "양념"
+    },
+    {
+      "id": 12,
+      "name": "소금",
+      "category": "양념"
+    },
+    {
+      "id": 13,
+      "name": "깨",
+      "category": "양념"
+    },
+    {
+      "id": 14,
+      "name": "호박",
+      "category": "채소"
+    },
+    {
+      "id": 15,
+      "name": "쪽파",
+      "category": "채소"
+    },
+    {
+      "id": 16,
+      "name": "고추장",
+      "category": "양념"
+    },
+    {
+      "id": 17,
+      "name": "설탕",
+      "category": "양념"
+    }
+  ],
+  "userIngredients": [],
+  "recipes": [
+    {
+      "id": 1,
+      "name": "김치볶음밥",
+      "time": 15,
+      "difficulty": "쉬움",
+      "servings": "1~2인분"
+    },
+    {
+      "id": 2,
+      "name": "계란말이",
+      "time": 10,
+      "difficulty": "쉬움",
+      "servings": "1~2인분"
+    },
+    {
+      "id": 3,
+      "name": "제육덮밥",
+      "time": 20,
+      "difficulty": "중간",
+      "servings": "1~2인분"
+    },
+    {
+      "id": 4,
+      "name": "김치찌개",
+      "time": 15,
+      "difficulty": "중간",
+      "servings": "1~2인분"
+    },
+    {
+      "id": 5,
+      "name": "된장찌개",
+      "time": 20,
+      "difficulty": "중간",
+      "servings": "1~2인분"
+    }
+  ],
+  "recipeIngredients": [
+    {
+      "id": 1,
+      "recipeId": 1,
+      "name": "김치",
+      "amount": "1 컵",
+      "isEssential": true
+    },
+    {
+      "id": 2,
+      "recipeId": 1,
+      "name": "밥",
+      "amount": "한 공기",
+      "isEssential": true
+    },
+    {
+      "id": 3,
+      "recipeId": 1,
+      "name": "간장",
+      "amount": "2 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 4,
+      "recipeId": 1,
+      "name": "소금",
+      "amount": "반 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 5,
+      "recipeId": 1,
+      "name": "대파",
+      "amount": "50g",
+      "isEssential": true
+    },
+    {
+      "id": 6,
+      "recipeId": 1,
+      "name": "깨",
+      "amount": "반 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 7,
+      "recipeId": 1,
+      "name": "쪽파",
+      "amount": "10g",
+      "isEssential": false
+    },
+    {
+      "id": 8,
+      "recipeId": 2,
+      "name": "계란",
+      "amount": "4 개",
+      "isEssential": true
+    },
+    {
+      "id": 9,
+      "recipeId": 2,
+      "name": "소금",
+      "amount": "반 작은술",
+      "isEssential": true
+    },
+    {
+      "id": 10,
+      "recipeId": 2,
+      "name": "대파",
+      "amount": "20g",
+      "isEssential": true
+    },
+    {
+      "id": 11,
+      "recipeId": 2,
+      "name": "당근",
+      "amount": "20g",
+      "isEssential": true
+    },
+    {
+      "id": 12,
+      "recipeId": 3,
+      "name": "돼지고기",
+      "amount": "200g",
+      "isEssential": true
+    },
+    {
+      "id": 13,
+      "recipeId": 3,
+      "name": "고추장",
+      "amount": "2 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 14,
+      "recipeId": 3,
+      "name": "설탕",
+      "amount": "1 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 15,
+      "recipeId": 3,
+      "name": "양파",
+      "amount": "반 개",
+      "isEssential": true
+    },
+    {
+      "id": 16,
+      "recipeId": 3,
+      "name": "대파",
+      "amount": "30g",
+      "isEssential": true
+    },
+    {
+      "id": 17,
+      "recipeId": 3,
+      "name": "밥",
+      "amount": "한 공기",
+      "isEssential": true
+    },
+    {
+      "id": 18,
+      "recipeId": 4,
+      "name": "김치",
+      "amount": "1 컵",
+      "isEssential": true
+    },
+    {
+      "id": 19,
+      "recipeId": 4,
+      "name": "돼지고기",
+      "amount": "150g",
+      "isEssential": true
+    },
+    {
+      "id": 20,
+      "recipeId": 4,
+      "name": "두부",
+      "amount": "반 모",
+      "isEssential": true
+    },
+    {
+      "id": 21,
+      "recipeId": 4,
+      "name": "대파",
+      "amount": "30g",
+      "isEssential": true
+    },
+    {
+      "id": 22,
+      "recipeId": 4,
+      "name": "물",
+      "amount": "2 컵",
+      "isEssential": true
+    },
+    {
+      "id": 23,
+      "recipeId": 5,
+      "name": "두부",
+      "amount": "반 모",
+      "isEssential": true
+    },
+    {
+      "id": 24,
+      "recipeId": 5,
+      "name": "된장",
+      "amount": "2 스푼",
+      "isEssential": true
+    },
+    {
+      "id": 25,
+      "recipeId": 5,
+      "name": "감자",
+      "amount": "1 개",
+      "isEssential": true
+    },
+    {
+      "id": 26,
+      "recipeId": 5,
+      "name": "대파",
+      "amount": "30g",
+      "isEssential": true
+    },
+    {
+      "id": 27,
+      "recipeId": 5,
+      "name": "물",
+      "amount": "2.5 컵",
+      "isEssential": true
+    },
+    {
+      "id": 28,
+      "recipeId": 5,
+      "name": "호박",
+      "amount": "1/4 개",
+      "isEssential": true
+    }
+  ],
+  "recipeSteps": [
+    {
+      "id": 1,
+      "recipeId": 1,
+      "stepNumber": 1,
+      "instruction": "후라이팬에 기름을 두르고 김치를 볶는다."
+    },
+    {
+      "id": 2,
+      "recipeId": 1,
+      "stepNumber": 2,
+      "instruction": "김치를 볶고 가장자리에 간장 1스푼을 넣고 태운다."
+    },
+    {
+      "id": 3,
+      "recipeId": 1,
+      "stepNumber": 3,
+      "instruction": "밥을 넣고 고슬고슬하게 볶는다."
+    },
+    {
+      "id": 4,
+      "recipeId": 1,
+      "stepNumber": 4,
+      "instruction": "소금으로 간을 맞춘다."
+    },
+    {
+      "id": 5,
+      "recipeId": 1,
+      "stepNumber": 5,
+      "instruction": "불을 끄고 김가루와 깨를 뿌리고 맛있게 먹는다."
+    },
+    {
+      "id": 6,
+      "recipeId": 2,
+      "stepNumber": 1,
+      "instruction": "계란을 그릇에 풀고 소금으로 간을 한다."
+    },
+    {
+      "id": 7,
+      "recipeId": 2,
+      "stepNumber": 2,
+      "instruction": "대파와 당근을 잘게 다져 푼 계란에 섞는다."
+    },
+    {
+      "id": 8,
+      "recipeId": 2,
+      "stepNumber": 3,
+      "instruction": "팬에 기름을 두르고 달군 뒤 계란물을 조금씩 부어가며 말아준다."
+    },
+    {
+      "id": 9,
+      "recipeId": 2,
+      "stepNumber": 4,
+      "instruction": "먹기 좋은 크기로 썰어 완성한다."
+    },
+    {
+      "id": 10,
+      "recipeId": 3,
+      "stepNumber": 1,
+      "instruction": "돼지고기를 고추장, 설탕 등으로 양념하여 재워둔다."
+    },
+    {
+      "id": 11,
+      "recipeId": 3,
+      "stepNumber": 2,
+      "instruction": "팬에 식용유를 두르고 양념한 고기를 볶는다."
+    },
+    {
+      "id": 12,
+      "recipeId": 3,
+      "stepNumber": 3,
+      "instruction": "고기가 익어갈 때 양파와 대파를 넣고 함께 볶는다."
+    },
+    {
+      "id": 13,
+      "recipeId": 3,
+      "stepNumber": 4,
+      "instruction": "그릇에 밥을 담고 볶은 제육을 올려 완성한다."
+    },
+    {
+      "id": 14,
+      "recipeId": 4,
+      "stepNumber": 1,
+      "instruction": "냄비에 김치와 돼지고기를 넣고 볶는다."
+    },
+    {
+      "id": 15,
+      "recipeId": 4,
+      "stepNumber": 2,
+      "instruction": "물을 붓고 끓이다가 썰어둔 두부와 대파를 넣는다."
+    },
+    {
+      "id": 16,
+      "recipeId": 4,
+      "stepNumber": 3,
+      "instruction": "국물이 진해질 때까지 푹 끓여 완성한다."
+    },
+    {
+      "id": 17,
+      "recipeId": 5,
+      "stepNumber": 1,
+      "instruction": "냄비에 물을 붓고 된장을 풀어 끓인다."
+    },
+    {
+      "id": 18,
+      "recipeId": 5,
+      "stepNumber": 2,
+      "instruction": "깍둑썰기한 감자와 호박을 넣고 익힌다."
+    },
+    {
+      "id": 19,
+      "recipeId": 5,
+      "stepNumber": 3,
+      "instruction": "마지막에 두부와 대파를 넣고 한소끔 더 끓여 완성한다."
+    }
+  ],
+  "bookmarks": [],
+  "shoppingLists": []
+}

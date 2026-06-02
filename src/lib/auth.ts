@@ -1,58 +1,58 @@
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { prisma } from "./db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_super_secret_key_987654321_cooking_guide";
+const JWT_SECRET = process.env.JWT_SECRET || "temporary-dev-secret-key-for-jwt-signing-cook-guide";
 
-export interface SessionPayload {
-  userId: string;
+export interface TokenPayload {
+  userId: number;
   username: string;
-  nickname?: string;
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+export function hashPassword(password: string): string {
+  const salt = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(password, salt);
 }
 
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+export function verifyPassword(password: string, hash: string): boolean {
+  return bcrypt.compareSync(password, hash);
 }
 
-export function signToken(payload: SessionPayload): string {
+export function signToken(payload: TokenPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function verifyToken(token: string): SessionPayload | null {
+export function verifyToken(token: string): TokenPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as SessionPayload;
+    return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch (error) {
     return null;
   }
 }
 
-export async function getSession(): Promise<SessionPayload | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("session")?.value;
-  if (!token) return null;
-  return verifyToken(token);
-}
+export async function getCurrentUser() {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-export async function createSession(userId: string, username: string, nickname?: string) {
-  const token = signToken({ userId, username, nickname });
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  const cookieStore = await cookies();
-  
-  cookieStore.set("session", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    expires: expiresAt,
-    sameSite: "lax",
-    path: "/",
-  });
-}
+    if (!token) return null;
 
-export async function deleteSession() {
-  const cookieStore = await cookies();
-  cookieStore.delete("session");
+    const payload = verifyToken(token);
+    if (!payload) return null;
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        username: true,
+        createdAt: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error getting current user: ", error);
+    return null;
+  }
 }

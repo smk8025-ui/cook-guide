@@ -844,7 +844,7 @@ export const RECIPES: Recipe[] = [
       "달군 팬에 식용유를 두르고 앞뒤로 각 4~5분씩 노릇하게 굽습니다.",
       "케첩과 돈가스 소스를 섞어 뿌려 완성합니다.",
     ],
-    image: "/images/grilled.png",
+    image: "/images/stir_fried_pork.png",
     matchIngredients: ["다진소고기", "다진돼지고기", "양파", "계란", "빵가루"],
   },
   {
@@ -1018,7 +1018,7 @@ export const RECIPES: Recipe[] = [
       "새우를 넣어 앞뒤로 2분씩 구워 완전히 익힙니다.",
       "파슬리 가루와 소금으로 마무리하고 레몬즙을 뿌려 냅니다.",
     ],
-    image: "/images/grilled.png",
+    image: "/images/stir_fried_pork.png",
     matchIngredients: ["새우", "버터", "마늘", "레몬"],
   },
 

@@ -10,23 +10,29 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
-  id             String           @id @default(uuid())
-  username       String           @unique
-  nickname       String?
-  passwordHash   String
-  createdAt      DateTime         @default(now())
-  ingredients    UserIngredient[]
-  favorites      Favorite[]
-  shoppingList   ShoppingItem[]
-  recentSearches RecentSearch[]
+  id            Int              @id @default(autoincrement())
+  username      String           @unique
+  password      String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  ingredients   UserIngredient[]
+  bookmarks     Bookmark[]
+  shoppingLists ShoppingList[]
+}
+
+model Ingredient {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  category String
 }
 
 model UserIngredient {
   id        Int      @id @default(autoincrement())
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   createdAt DateTime @default(now())
@@ -34,30 +40,51 @@ model UserIngredient {
   @@unique([userId, name])
 }
 
-model Favorite {
+model Recipe {
+  id          Int                @id @default(autoincrement())
+  name        String             @unique
+  time        Int
+  difficulty  String
+  servings    String
+  ingredients RecipeIngredient[]
+  steps       RecipeStep[]
+  bookmarks   Bookmark[]
+}
+
+model RecipeIngredient {
+  id          Int     @id @default(autoincrement())
+  recipeId    Int
+  recipe      Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  name        String
+  amount      String
+  isEssential Boolean @default(true)
+}
+
+model RecipeStep {
+  id          Int    @id @default(autoincrement())
+  recipeId    Int
+  recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  stepNumber  Int
+  instruction String
+}
+
+model Bookmark {
   id        Int      @id @default(autoincrement())
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipeId  String
+  recipeId  Int
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, recipeId])
 }
 
-model ShoppingItem {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  createdAt DateTime @default(now())
+model ShoppingList {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ingredientName String
+  createdAt      DateTime @default(now())
 
-  @@unique([userId, name])
-}
-
-model RecentSearch {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  query     String
-  createdAt DateTime @default(now())
+  @@unique([userId, ingredientName])
 }

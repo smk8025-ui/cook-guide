@@ -1,228 +1,222 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, startTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams?.get("from") || "/";
+
+  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const isFormValid = username.trim() !== "" && password.trim() !== "" &&
+    (activeTab === "login" || confirmPassword.trim() !== "");
+
+  const handleTabChange = (tab: "login" | "register") => {
+    setActiveTab(tab);
+    setError("");
+    setSuccessMsg("");
+    setPassword("");
+    setConfirmPassword("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) return;
+    if (!isFormValid) return;
 
     setError("");
+    setSuccessMsg("");
     setLoading(true);
 
-    const url = isLogin ? "/api/auth/login" : "/api/auth/signup";
-
     try {
-      const body = isLogin
-        ? { username, password }
-        : { username, password, nickname: nickname.trim() || undefined };
+      if (activeTab === "login") {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || "아이디 또는 비밀번호가 틀렸습니다.");
+          setLoading(false);
+          return;
+        }
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "인증에 실패했습니다.");
+        // Login success, redirect to target page
+        startTransition(() => {
+          router.push(redirectPath);
+          router.refresh();
+        });
       } else {
-        router.push("/");
-        router.refresh();
+        // Register mode
+        if (password !== confirmPassword) {
+          setError("비밀번호가 일치하지 않습니다.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || "회원가입에 실패했습니다.");
+          setLoading(false);
+          return;
+        }
+
+        setSuccessMsg("회원가입이 완료되었습니다! 로그인해 주세요.");
+        setActiveTab("login");
+        setPassword("");
+        setConfirmPassword("");
+        setLoading(false);
       }
     } catch (err) {
-      setError("서버와의 연결이 원활하지 않습니다.");
-    } finally {
+      console.error(err);
+      setError("서버와 통신하는 중 문제가 발생했습니다.");
       setLoading(false);
     }
   };
 
-  const isFormValid = username.trim() !== "" && password.trim() !== "";
-
-
   return (
-    <div className="flex min-h-screen flex-col justify-center px-6 py-12 dark:bg-zinc-900 bg-brand-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* LOGO */}
+    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 py-12 dark:bg-zinc-950">
+      <div className="w-full max-w-md space-y-8 rounded-3xl bg-white p-8 shadow-xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50">
+
+        {/* LOGO & SLOGAN */}
         <div className="text-center">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-brand-primary/10 text-brand-primary dark:bg-brand-primary/20 dark:text-brand-primary-light mb-3">
-            🍳 자취생을 위한 초간단 요리 도우미
-          </span>
-          <h1 className="text-4xl font-extrabold tracking-tight text-brand-primary dark:text-brand-primary-light">
+          <h1 className="text-4xl font-extrabold tracking-tight text-brand-primary animate-bounce">
             냉털쿡
           </h1>
-          <p className="mt-2 text-sm text-brand-gray-500 dark:text-brand-gray-400">
+          <p className="mt-2.5 text-sm text-brand-gray-500 dark:text-brand-gray-300">
             냉장고 재료로 쉽게 요리하세요
           </p>
         </div>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white dark:bg-zinc-800 py-8 px-6 shadow-xl rounded-3xl border border-brand-gray-100 dark:border-zinc-700/50">
-          {/* Tab Selector */}
-          <div className="flex border-b border-brand-gray-100 dark:border-zinc-700 mb-6">
-            <button
-              onClick={() => {
-                setIsLogin(true);
-                setError("");
-              }}
-              className={`flex-1 pb-3 text-center text-sm font-semibold transition-all duration-200 ${
-                isLogin
-                  ? "border-b-2 border-brand-primary text-brand-primary dark:text-brand-primary-light"
-                  : "text-brand-gray-500 dark:text-brand-gray-400 hover:text-brand-primary"
+        {/* TABS */}
+        <div className="flex rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
+          <button
+            type="button"
+            onClick={() => handleTabChange("login")}
+            className={`flex-1 rounded-lg py-2.5 text-xs font-semibold transition-all duration-200 ${activeTab === "login"
+                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
               }`}
-            >
-              로그인
-            </button>
-            <button
-              onClick={() => {
-                setIsLogin(false);
-                setError("");
-              }}
-              className={`flex-1 pb-3 text-center text-sm font-semibold transition-all duration-200 ${
-                !isLogin
-                  ? "border-b-2 border-brand-primary text-brand-primary dark:text-brand-primary-light"
-                  : "text-brand-gray-500 dark:text-brand-gray-400 hover:text-brand-primary"
+          >
+            로그인
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("register")}
+            className={`flex-1 rounded-lg py-2.5 text-xs font-semibold transition-all duration-200 ${activeTab === "register"
+                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
               }`}
-            >
-              회원가입
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-xs font-semibold text-brand-gray-700 dark:text-brand-gray-300 uppercase tracking-wider"
-              >
-                아이디
-              </label>
-              <div className="mt-1.5">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  placeholder="아이디를 입력해주세요"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full h-11 px-4 rounded-xl border border-brand-gray-300 dark:border-zinc-700 bg-brand-gray-50 dark:bg-zinc-900 text-brand-gray-900 dark:text-zinc-50 placeholder-brand-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            {/* 닉네임 필드 — 회원가입 시에만 표시 */}
-            <div
-              className="overflow-hidden transition-all duration-300 ease-in-out"
-              style={{ maxHeight: isLogin ? "0" : "100px", opacity: isLogin ? 0 : 1 }}
-              aria-hidden={isLogin}
-            >
-              <label
-                htmlFor="nickname"
-                className="block text-xs font-semibold text-brand-gray-700 dark:text-brand-gray-300 uppercase tracking-wider"
-              >
-                닉네임 <span className="text-brand-gray-400 normal-case font-normal">(선택, 최대 12자)</span>
-              </label>
-              <div className="mt-1.5">
-                <input
-                  id="nickname"
-                  name="nickname"
-                  type="text"
-                  maxLength={12}
-                  placeholder="표시될 닉네임을 입력해주세요"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  tabIndex={isLogin ? -1 : 0}
-                  className="block w-full h-11 px-4 rounded-xl border border-brand-gray-300 dark:border-zinc-700 bg-brand-gray-50 dark:bg-zinc-900 text-brand-gray-900 dark:text-zinc-50 placeholder-brand-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-xs font-semibold text-brand-gray-700 dark:text-brand-gray-300 uppercase tracking-wider"
-              >
-                비밀번호
-              </label>
-              <div className="mt-1.5">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  placeholder="비밀번호를 입력해주세요"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full h-11 px-4 rounded-xl border border-brand-gray-300 dark:border-zinc-700 bg-brand-gray-50 dark:bg-zinc-900 text-brand-gray-900 dark:text-zinc-50 placeholder-brand-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary transition-all duration-200"
-                />
-              </div>
-            </div>
-
-
-            {error && (
-              <div className="text-xs text-brand-danger bg-brand-danger/10 p-3 rounded-xl flex items-center gap-2 border border-brand-danger/20 animate-shake">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 shrink-0">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={!isFormValid || loading}
-                className={`w-full h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-brand-primary/20 active-press transition-all duration-200 ${
-                  isFormValid && !loading
-                    ? "bg-gradient-to-r from-brand-primary to-brand-primary-dark hover:brightness-110 cursor-pointer"
-                    : "bg-brand-gray-300 dark:bg-zinc-700 text-brand-gray-500 cursor-not-allowed shadow-none"
-                }`}
-              >
-                {loading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : isLogin ? (
-                  "로그인"
-                ) : (
-                  "회원가입"
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Additional controls */}
-          <div className="mt-6 text-center text-xs text-brand-gray-500 dark:text-brand-gray-400">
-            <button
-              onClick={() => alert("임시 비밀번호를 전송하였습니다. (가상)")}
-              className="hover:underline font-medium focus:outline-none"
-            >
-              비밀번호 찾기
-            </button>
-            <span className="mx-2 text-brand-gray-300 dark:text-zinc-700">or</span>
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError("");
-              }}
-              className="hover:underline font-medium focus:outline-none text-brand-primary dark:text-brand-primary-light"
-            >
-              {isLogin ? "회원가입 하기" : "로그인 하기"}
-            </button>
-          </div>
+          >
+            회원가입
+          </button>
         </div>
+
+        {/* FORM */}
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+              아이디
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="아이디를 입력해주세요"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+              비밀번호
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
+            />
+          </div>
+
+          {activeTab === "register" && (
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                비밀번호 확인
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="비밀번호를 한번 더 입력해주세요"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
+              />
+            </div>
+          )}
+
+          {/* SUCCESS MESSAGE */}
+          {successMsg && (
+            <div className="text-center text-xs font-medium text-brand-success">
+              {successMsg}
+            </div>
+          )}
+
+          {/* ERROR MESSAGE */}
+          {error && (
+            <div className="text-center text-xs font-medium text-brand-danger">
+              {error}
+            </div>
+          )}
+
+          {/* BUTTON */}
+          <button
+            type="submit"
+            disabled={!isFormValid || loading}
+            className={`w-full rounded-xl py-3.5 text-sm font-semibold text-white transition-all duration-200 active-press ${!isFormValid
+                ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                : "bg-brand-primary hover:bg-brand-primary-dark shadow-md shadow-brand-primary/10"
+              }`}
+          >
+            {loading ? "처리 중..." : activeTab === "login" ? "로그인" : "회원가입"}
+          </button>
+        </form>
+
+        {/* OR DIVIDER & HELP */}
+        <div className="relative flex py-2 items-center">
+          <div className="flex-grow border-t border-zinc-150 dark:border-zinc-800"></div>
+          <span className="flex-shrink mx-4 text-xs text-zinc-400 dark:text-zinc-500">or</span>
+          <div className="flex-grow border-t border-zinc-150 dark:border-zinc-800"></div>
+        </div>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => alert("비밀번호 찾기 기능은 아직 개발 중입니다. 새 계정을 생성해 주세요!")}
+            className="text-xs font-semibold text-zinc-400 hover:text-brand-primary dark:text-zinc-500"
+          >
+            비밀번호 찾기
+          </button>
+        </div>
+
       </div>
     </div>
   );
