@@ -7,11 +7,11 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams?.get("from") || "/";
-
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [nickname, setNickname] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -25,6 +25,7 @@ export default function LoginPage() {
     setSuccessMsg("");
     setPassword("");
     setConfirmPassword("");
+    setNickname("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -91,12 +91,13 @@ export const prisma = {
       }
       return user;
     },
-    create: async (args: { data: { username: string; passwordHash?: string; password?: string } }) => {
+    create: async (args: { data: { username: string; passwordHash?: string; password?: string; nickname?: string } }) => {
       const db = readDb();
       const newUser = {
         id: nextId(db.users),
         username: args.data.username,
         password: args.data.password || args.data.passwordHash || "",
+        nickname: args.data.nickname || args.data.username,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -278,7 +279,7 @@ export const prisma = {
     deleteMany: async (args?: { where?: { recipeId: number } }) => {
       const db = readDb();
       if (args?.where?.recipeId !== undefined) {
-        db.recipeIngredients = db.recipeIngredients.filter((ri) => ri.recipeId !== args.where.recipeId);
+        db.recipeIngredients = db.recipeIngredients.filter((ri) => ri.recipeId !== args.where!.recipeId);
       } else {
         db.recipeIngredients = [];
       }
@@ -303,7 +304,7 @@ export const prisma = {
     deleteMany: async (args?: { where?: { recipeId: number } }) => {
       const db = readDb();
       if (args?.where?.recipeId !== undefined) {
-        db.recipeSteps = db.recipeSteps.filter((rs) => rs.recipeId !== args.where.recipeId);
+        db.recipeSteps = db.recipeSteps.filter((rs) => rs.recipeId !== args.where!.recipeId);
       } else {
         db.recipeSteps = [];
       }

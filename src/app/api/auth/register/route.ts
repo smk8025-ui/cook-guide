@@ -4,7 +4,7 @@ import { hashPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password } = await req.json();
+    const { username, password, nickname } = await req.json();
 
     if (!username || !password) {
       return NextResponse.json(
@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const trimmedNickname = nickname?.trim();
+    if (trimmedNickname && trimmedNickname.length > 12) {
+      return NextResponse.json(
+        { error: "닉네임은 최대 12자까지 설정 가능합니다." },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { username },
@@ -45,6 +53,7 @@ export async function POST(req: NextRequest) {
       data: {
         username,
         password: passwordHash,
+        nickname: trimmedNickname || username,
       },
     });
 
