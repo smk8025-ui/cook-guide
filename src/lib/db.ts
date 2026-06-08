@@ -627,6 +627,39 @@ export const prisma = {
       }
       writeDb(db);
       return { count: initialLength - db.shoppingLists.length };
-    }
+    },
+    // Batch upsert: adds all names in a single read/write to avoid ID conflicts
+    upsertMany: async (args: { userId: number; names: string[] }) => {
+      const db = readDb();
+      if (!db.shoppingLists) db.shoppingLists = [];
+
+      const { userId, names } = args;
+      const added: string[] = [];
+
+      for (const rawName of names) {
+        const trimmed = rawName.trim();
+        if (!trimmed) continue;
+
+        const exists = db.shoppingLists.find(
+          (s) => s.userId === userId && (s.ingredientName === trimmed || s.name === trimmed)
+        );
+        if (!exists) {
+          const newItem = {
+            id: nextId(db.shoppingLists),
+            userId,
+            ingredientName: trimmed,
+            createdAt: new Date().toISOString(),
+          };
+          db.shoppingLists.push(newItem);
+          added.push(trimmed);
+        }
+      }
+
+      if (added.length > 0) {
+        writeDb(db);
+      }
+
+      return added;
+    },
   },
 };

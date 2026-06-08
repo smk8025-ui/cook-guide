@@ -120,20 +120,8 @@
     {
       "id": 3,
       "userId": 2,
-      "name": "김치",
-      "createdAt": "2026-06-08T10:47:10.226Z"
-    },
-    {
-      "id": 4,
-      "userId": 2,
-      "name": "계란",
-      "createdAt": "2026-06-08T10:47:10.228Z"
-    },
-    {
-      "id": 5,
-      "userId": 2,
-      "name": "대파",
-      "createdAt": "2026-06-08T10:47:10.233Z"
+      "name": "양파",
+      "createdAt": "2026-06-08T23:49:51.202Z"
     }
   ],
   "recipes": [
@@ -549,6 +537,42 @@
       "userId": 1,
       "ingredientName": "물",
       "createdAt": "2026-06-08T10:21:27.742Z"
+    },
+    {
+      "id": 10,
+      "userId": 2,
+      "ingredientName": "스파게티면",
+      "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 11,
+      "userId": 2,
+      "ingredientName": "마늘",
+      "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 12,
+      "userId": 2,
+      "ingredientName": "페페론치노",
+      "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 13,
+      "userId": 2,
+      "ingredientName": "올리브유",
+      "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 14,
+      "userId": 2,
+      "ingredientName": "파슬리 가루",
+      "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 15,
+      "userId": 2,
+      "ingredientName": "물",
+      "createdAt": "2026-06-08T23:48:55.070Z"
     }
   ],
   "recentSearches": [
@@ -557,6 +581,12 @@
       "userId": 1,
       "query": "당근",
       "createdAt": "2026-06-08T10:24:45.361Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "query": "양파",
+      "createdAt": "2026-06-08T23:49:51.266Z"
     }
   ]
 }

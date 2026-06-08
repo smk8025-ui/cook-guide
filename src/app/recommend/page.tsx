@@ -44,11 +44,17 @@ export default function RecommendPage() {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const handleAddShoppingList = async (e: React.MouseEvent, missingIngs: string[]) => {
+  const handleAddShoppingList = async (e: React.MouseEvent, result: MatchResult) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (missingIngs.length === 0) {
+    // Use allMissingIngredients (full recipe.ingredients based) so that
+    // seasonings/water/oil etc. are also added, not just matchIngredients.
+    const toAdd = result.allMissingIngredients.length > 0
+      ? result.allMissingIngredients
+      : result.missingIngredients;
+
+    if (toAdd.length === 0) {
       triggerToast("부족한 재료가 없습니다!");
       return;
     }
@@ -57,7 +63,7 @@ export default function RecommendPage() {
       const res = await fetch("/api/shopping-list", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ names: missingIngs }),
+        body: JSON.stringify({ names: toAdd }),
       });
 
       if (res.ok) {
@@ -284,7 +290,7 @@ export default function RecommendPage() {
                               </div>
                               {missingIngredients.length > 0 && (
                                 <button
-                                  onClick={(e) => handleAddShoppingList(e, missingIngredients)}
+                                  onClick={(e) => handleAddShoppingList(e, result)}
                                   className="flex items-center gap-1 bg-white dark:bg-zinc-800 border border-brand-gray-200 dark:border-zinc-700 hover:border-brand-primary dark:hover:border-brand-primary/50 text-brand-gray-700 dark:text-zinc-200 px-3 py-1.5 rounded-xl font-bold transition-all duration-200 shrink-0 shadow-sm active-press focus:outline-none"
                                 >
                                   <span className="text-sm">🛒</span>

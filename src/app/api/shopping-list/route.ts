@@ -34,30 +34,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "추가할 항목명을 입력해주세요." }, { status: 400 });
     }
 
-    const added: string[] = [];
-    for (const itemName of listToAdd) {
-      const trimmed = itemName.trim();
-      if (!trimmed) continue;
-
-      try {
-        const item = await prisma.shoppingItem.upsert({
-          where: {
-            userId_name: {
-              userId: session.userId,
-              name: trimmed,
-            },
-          },
-          update: {},
-          create: {
-            userId: session.userId,
-            name: trimmed,
-          },
-        });
-        added.push(item.name);
-      } catch (e) {
-        // Skip duplicate unique constraint issues
-      }
-    }
+    // Use batch upsert to add all items in a single read/write operation,
+    // preventing ID conflicts and ensuring no items are silently skipped.
+    const added = await (prisma.shoppingItem as any).upsertMany({
+      userId: session.userId,
+      names: listToAdd,
+    });
 
     return NextResponse.json({ success: true, added });
   } catch (error) {

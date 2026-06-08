@@ -1546,6 +1546,7 @@ export interface MatchResult {
   recipe: Recipe;
   ownedIngredients: string[];
   missingIngredients: string[];
+  allMissingIngredients: string[]; // Full missing list from recipe.ingredients
   matchRate: number;
 }
 
@@ -1563,12 +1564,18 @@ export function getRecommendedRecipes(userIngredients: string[]): MatchResult[] 
       }
     });
 
+    // Compute full missing ingredients from recipe.ingredients (not just matchIngredients)
+    const allMissing: string[] = recipe.ingredients
+      .map((ing) => ing.name)
+      .filter((ingName) => !userIngredients.some((userIng) => isMatch(userIng, ingName)));
+
     const matchRate = Math.round((owned.length / recipe.matchIngredients.length) * 100);
 
     return {
       recipe,
       ownedIngredients: owned,
       missingIngredients: missing,
+      allMissingIngredients: allMissing,
       matchRate,
     };
   });
