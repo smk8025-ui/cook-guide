@@ -20,7 +20,7 @@ type SearchTab = "ingredient" | "menu";
 
 export default function SearchPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<SearchTab>("ingredient");
+  const [activeTab, setActiveTab] = useState<SearchTab>("menu");
   
   // Ingredient search state
   const [ingredientQuery, setIngredientQuery] = useState("");

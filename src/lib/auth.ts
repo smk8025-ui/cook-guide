@@ -46,6 +46,7 @@ export async function getCurrentUser() {
       select: {
         id: true,
         username: true,
+        nickname: true,
         createdAt: true,
       },
     });
@@ -56,3 +57,15 @@ export async function getCurrentUser() {
     return null;
   }
 }
+
+export async function getSession(): Promise<TokenPayload | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) return null;
+    return verifyToken(token);
+  } catch (error) {
+    return null;
+  }
+}
+

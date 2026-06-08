@@ -16,6 +16,7 @@ interface DbSchema {
   recipeSteps: any[];
   bookmarks: any[];
   shoppingLists: any[];
+  recentSearches: any[];
 }
 
 function readDb(): DbSchema {
@@ -35,12 +36,15 @@ function readDb(): DbSchema {
         recipeSteps: [],
         bookmarks: [],
         shoppingLists: [],
+        recentSearches: [],
       };
       fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf8");
       return initial;
     }
     const content = fs.readFileSync(DB_FILE, "utf8");
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    parsed.recentSearches = parsed.recentSearches || [];
+    return parsed;
   } catch (error) {
     console.error("Error reading JSON db, returning empty state:", error);
     return {
@@ -52,6 +56,7 @@ function readDb(): DbSchema {
       recipeSteps: [],
       bookmarks: [],
       shoppingLists: [],
+      recentSearches: [],
     };
   }
 }
@@ -165,6 +170,22 @@ export const prisma = {
       db.userIngredients.push(newUi);
       writeDb(db);
       return newUi;
+    },
+    upsert: async (args: { where: { userId_name: { userId: number; name: string } }; update: any; create: { userId: number; name: string } }) => {
+      const db = readDb();
+      const { userId, name } = args.where.userId_name;
+      let ui = db.userIngredients.find((x) => x.userId === userId && x.name === name);
+      if (!ui) {
+        ui = {
+          id: nextId(db.userIngredients),
+          userId: args.create.userId,
+          name: args.create.name,
+          createdAt: new Date().toISOString(),
+        };
+        db.userIngredients.push(ui);
+        writeDb(db);
+      }
+      return ui;
     },
     delete: async (args: { where: { id?: number; userId_name?: { userId: number; name: string } } }) => {
       const db = readDb();
@@ -436,5 +457,176 @@ export const prisma = {
       writeDb(db);
       return { count: 0 };
     },
+  },
+
+  recentSearch: {
+    findMany: async (args?: { where?: { userId: number }; orderBy?: { createdAt: string }; take?: number }) => {
+      const db = readDb();
+      let list = db.recentSearches || [];
+      if (args?.where?.userId !== undefined) {
+        list = list.filter((x) => x.userId === args.where!.userId);
+      }
+      list = [...list].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      if (args?.take !== undefined) {
+        list = list.slice(0, args.take);
+      }
+      return list;
+    },
+    findFirst: async (args?: { where?: { userId: number }; orderBy?: { createdAt: string } }) => {
+      const db = readDb();
+      let list = db.recentSearches || [];
+      if (args?.where?.userId !== undefined) {
+        list = list.filter((x) => x.userId === args.where!.userId);
+      }
+      list = [...list].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return list[0] || null;
+    },
+    create: async (args: { data: { userId: number; query: string } }) => {
+      const db = readDb();
+      if (!db.recentSearches) db.recentSearches = [];
+      const newRs = {
+        id: nextId(db.recentSearches),
+        userId: args.data.userId,
+        query: args.data.query,
+        createdAt: new Date().toISOString(),
+      };
+      db.recentSearches.push(newRs);
+      writeDb(db);
+      return newRs;
+    },
+    deleteMany: async (args?: { where?: { userId: number } }) => {
+      const db = readDb();
+      if (!db.recentSearches) db.recentSearches = [];
+      if (args?.where?.userId !== undefined) {
+        const initialLength = db.recentSearches.length;
+        db.recentSearches = db.recentSearches.filter((x) => x.userId !== args.where!.userId);
+        writeDb(db);
+        return { count: initialLength - db.recentSearches.length };
+      }
+      db.recentSearches = [];
+      writeDb(db);
+      return { count: 0 };
+    },
+  },
+
+  favorite: {
+    findMany: async (args: { where: { userId: number }; orderBy?: { createdAt: string } }) => {
+      const db = readDb();
+      let list = db.bookmarks || [];
+      if (args.where.userId !== undefined) {
+        list = list.filter((b) => b.userId === args.where.userId);
+      }
+      list = [...list].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      return list;
+    },
+    upsert: async (args: { where: { userId_recipeId: { userId: number; recipeId: string } }; update: any; create: { userId: number; recipeId: string } }) => {
+      const db = readDb();
+      if (!db.bookmarks) db.bookmarks = [];
+      const { userId, recipeId } = args.where.userId_recipeId;
+      let fav = db.bookmarks.find((b) => b.userId === userId && String(b.recipeId) === String(recipeId));
+      if (!fav) {
+        fav = {
+          id: nextId(db.bookmarks),
+          userId: args.create.userId,
+          recipeId: args.create.recipeId,
+          createdAt: new Date().toISOString(),
+        };
+        db.bookmarks.push(fav);
+        writeDb(db);
+      }
+      return fav;
+    },
+    deleteMany: async (args?: { where?: { userId: number; recipeId?: string | { in: string[] } } }) => {
+      const db = readDb();
+      if (!db.bookmarks) db.bookmarks = [];
+      
+      const initialLength = db.bookmarks.length;
+      if (args?.where) {
+        const { userId, recipeId } = args.where;
+        db.bookmarks = db.bookmarks.filter((b) => {
+          if (b.userId !== userId) return true;
+          
+          if (recipeId !== undefined) {
+            if (typeof recipeId === "object" && recipeId !== null && "in" in recipeId) {
+              const inList = (recipeId as any).in.map(String);
+              if (inList.includes(String(b.recipeId))) return false;
+            } else {
+              if (String(b.recipeId) === String(recipeId)) return false;
+            }
+          } else {
+            return false;
+          }
+          return true;
+        });
+      } else {
+        db.bookmarks = [];
+      }
+      
+      writeDb(db);
+      return { count: initialLength - db.bookmarks.length };
+    }
+  },
+
+  shoppingItem: {
+    findMany: async (args: { where: { userId: number }; orderBy?: { createdAt: string } }) => {
+      const db = readDb();
+      let list = db.shoppingLists || [];
+      if (args.where.userId !== undefined) {
+        list = list.filter((s) => s.userId === args.where.userId);
+      }
+      list = [...list].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+      
+      return list.map((item) => ({
+        id: item.id,
+        userId: item.userId,
+        name: item.ingredientName || item.name,
+        createdAt: item.createdAt,
+      }));
+    },
+    upsert: async (args: { where: { userId_name: { userId: number; name: string } }; update: any; create: { userId: number; name: string } }) => {
+      const db = readDb();
+      if (!db.shoppingLists) db.shoppingLists = [];
+      const { userId, name } = args.where.userId_name;
+      
+      let item = db.shoppingLists.find((s) => s.userId === userId && (s.ingredientName === name || s.name === name));
+      if (!item) {
+        item = {
+          id: nextId(db.shoppingLists),
+          userId: args.create.userId,
+          ingredientName: args.create.name,
+          createdAt: new Date().toISOString(),
+        };
+        db.shoppingLists.push(item);
+        writeDb(db);
+      }
+      return {
+        id: item.id,
+        userId: item.userId,
+        name: item.ingredientName || item.name,
+        createdAt: item.createdAt,
+      };
+    },
+    deleteMany: async (args?: { where?: { userId: number; name?: string } }) => {
+      const db = readDb();
+      if (!db.shoppingLists) db.shoppingLists = [];
+      
+      const initialLength = db.shoppingLists.length;
+      if (args?.where) {
+        const { userId, name } = args.where;
+        db.shoppingLists = db.shoppingLists.filter((s) => {
+          if (s.userId !== userId) return true;
+          if (name !== undefined) {
+            if (s.ingredientName === name || s.name === name) return false;
+          } else {
+            return false;
+          }
+          return true;
+        });
+      } else {
+        db.shoppingLists = [];
+      }
+      writeDb(db);
+      return { count: initialLength - db.shoppingLists.length };
+    }
   },
 };

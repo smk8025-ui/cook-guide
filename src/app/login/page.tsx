@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, startTransition } from "react";
+import { useState, startTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import LogoMark from "@/components/LogoMark";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectPath = searchParams?.get("from") || "/";
@@ -67,7 +68,7 @@ export default function LoginPage() {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username, password, nickname }),
         });
 
         const data = await res.json();
@@ -95,8 +96,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 rounded-3xl bg-white p-8 shadow-xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50">
 
         {/* LOGO & SLOGAN */}
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-brand-primary animate-bounce">
+        <div className="text-center flex flex-col items-center">
+          <LogoMark size="lg" className="mb-4 animate-bounce" />
+          <h1 className="text-4xl font-extrabold tracking-tight text-brand-primary">
             냉털쿡
           </h1>
           <p className="mt-2.5 text-sm text-brand-gray-500 dark:text-brand-gray-300">
@@ -159,19 +161,34 @@ export default function LoginPage() {
           </div>
 
           {activeTab === "register" && (
-            <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
-                비밀번호 확인
-              </label>
-              <input
-                type="password"
-                required
-                placeholder="비밀번호를 한번 더 입력해주세요"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                  비밀번호 확인
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="비밀번호를 한번 더 입력해주세요"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2">
+                  닉네임 (선택)
+                </label>
+                <input
+                  type="text"
+                  placeholder="사용할 닉네임을 입력해주세요"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 dark:border-zinc-800 dark:text-white"
+                />
+              </div>
+            </>
           )}
 
           {/* SUCCESS MESSAGE */}
@@ -220,5 +237,13 @@ export default function LoginPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="animate-spin h-8 w-8 rounded-full border-4 border-brand-primary border-t-transparent" /></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

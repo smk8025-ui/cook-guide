@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import LogoMark from "./LogoMark";
 
 interface Recipe {
   id: number;
@@ -13,7 +14,7 @@ interface Recipe {
 }
 
 interface HomeClientProps {
-  user: { username: string } | null;
+  user: { username: string; nickname?: string | null } | null;
   recommendedRecipes: Recipe[];
 }
 
@@ -22,6 +23,7 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
   const [isPending, startTransition] = useTransition();
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [photoLoading, setPhotoLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -40,7 +42,18 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowPhotoModal(false);
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
     }
   };
 
@@ -52,6 +65,10 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
       setPhotoLoading(false);
       setShowPhotoModal(false);
       setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
       // Redirect to ingredient entry with recognized ingredients query
       router.push("/ingredients?photoRecognized=김치,계란,대파");
     }, 2000);
@@ -63,10 +80,11 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
       {/* HEADER */}
       <header className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
         <div className="flex items-center gap-2">
+          <LogoMark size="sm" />
           <span className="text-2xl font-black text-brand-primary">냉털쿡</span>
           {user && (
-            <span className="text-[11px] font-medium bg-brand-primary/10 text-brand-primary px-2 py-0.5 rounded-full">
-              {user.username}님 🧑‍🍳
+            <span className="text-[11px] font-medium bg-brand-primary/10 text-brand-primary px-2 py-0.5 rounded-full animate-scale-in">
+              {user.nickname || user.username}님 환영합니다! 🧑‍🍳
             </span>
           )}
         </div>
@@ -103,7 +121,7 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
       <section className="my-6 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-primary-dark p-5 text-white shadow-lg shadow-brand-primary/15 relative overflow-hidden">
         <div className="relative z-10">
           <h2 className="text-xl font-bold leading-tight">
-            오늘도 냉장고 파먹기!<br />남은 식재료로 뭐 만들지?
+            {user ? `${user.nickname || user.username}님, 환영합니다! ✨` : "오늘도 냉장고 파먹기!"}<br />남은 식재료로 뭐 만들지?
           </h2>
           <p className="mt-2 text-xs opacity-90">
             가지고 계신 식재료만 넣으면 최적의 요리 레시피를 분석해 드려요.
@@ -207,32 +225,59 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
               식재료나 냉장고 내부 사진을 업로드해 보세요. AI가 자동으로 분석하여 인식합니다.
             </p>
 
-            <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-xl p-6 text-center mb-4 flex flex-col items-center justify-center hover:border-brand-primary/50 transition-colors">
+            <div className={`relative overflow-hidden rounded-xl border-2 mb-4 flex flex-col items-center justify-center transition-all min-h-[160px] ${
+              photoLoading 
+                ? "border-emerald-500 animate-scan-glow" 
+                : selectedFile 
+                  ? "border-zinc-300 dark:border-zinc-700" 
+                  : "border-dashed border-zinc-200 dark:border-zinc-700 hover:border-brand-primary/50"
+            }`}>
               <input
                 type="file"
                 accept="image/*"
                 id="photo-file"
                 className="hidden"
                 onChange={handleFileChange}
+                disabled={photoLoading}
               />
-              <label htmlFor="photo-file" className="cursor-pointer flex flex-col items-center">
-                <span className="text-3xl mb-2">📷</span>
-                <span className="text-xs font-bold text-brand-primary">사진 선택하기</span>
-                {selectedFile && (
-                  <span className="text-[11px] text-zinc-500 dark:text-zinc-300 mt-2 truncate max-w-[200px]">
-                    {selectedFile.name}
+              
+              {selectedFile && previewUrl ? (
+                <div className="relative w-full min-h-[160px] flex items-center justify-center bg-zinc-950/5 dark:bg-zinc-950/20 py-2">
+                  <img
+                    src={previewUrl}
+                    alt="Scan Preview"
+                    className="max-h-[180px] object-contain w-full rounded-lg"
+                  />
+                  
+                  {!photoLoading && (
+                    <label htmlFor="photo-file" className="absolute bottom-2 right-2 cursor-pointer bg-black/60 hover:bg-black/80 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg backdrop-blur-xs transition-colors active-press">
+                      사진 변경
+                    </label>
+                  )}
+                  
+                  {photoLoading && (
+                    <>
+                      <div className="absolute left-0 w-full h-[3px] bg-emerald-400 shadow-[0_0_12px_#10b981,0_0_6px_#059669] animate-scan" />
+                      <div className="absolute inset-0 bg-emerald-500/5 pointer-events-none" />
+                    </>
+                  )}
+                </div>
+              ) : (
+                <label htmlFor="photo-file" className="cursor-pointer flex flex-col items-center p-6 w-full h-full">
+                  <span className="text-3xl mb-2">📷</span>
+                  <span className="text-xs font-bold text-brand-primary">사진 선택하기</span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+                    식재료나 냉장고 내부 사진
                   </span>
-                )}
-              </label>
+                </label>
+              )}
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={() => {
-                  setShowPhotoModal(false);
-                  setSelectedFile(null);
-                }}
-                className="flex-1 rounded-xl bg-zinc-100 py-3 text-xs font-bold text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                onClick={handleCloseModal}
+                disabled={photoLoading}
+                className="flex-1 rounded-xl bg-zinc-100 py-3 text-xs font-bold text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50"
               >
                 취소
               </button>

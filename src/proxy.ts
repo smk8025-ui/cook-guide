@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
-  const session = request.cookies.get("session")?.value;
+  const token = request.cookies.get("token")?.value;
   const { pathname } = request.nextUrl;
 
   // 1. Skip static assets, next internals, and public resources
@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Allow authentication APIs
+  // 2. Allow authentication APIs freely
   const isAuthApi = pathname.startsWith("/api/auth/");
   if (isAuthApi) {
     return NextResponse.next();
@@ -23,20 +23,32 @@ export function proxy(request: NextRequest) {
 
   const isLoginPage = pathname === "/login";
 
-  // 3. If no session
-  if (!session) {
+  // Protected routes require authentication
+  const protectedRoutes = ["/favorites", "/shopping-list", "/mypage", "/ingredients", "/recommend"];
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
+  // 3. If no token
+  if (!token) {
+    // Allow login page and unprotected pages
     if (isLoginPage) {
       return NextResponse.next();
     }
-    // For API endpoints, return JSON 401 instead of redirecting
+    // For protected API endpoints, return JSON 401
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "인증되지 않은 사용자입니다." }, { status: 401 });
     }
-    // Redirect web requests to login page
-    return NextResponse.redirect(new URL("/login", request.url));
+    // Redirect protected web routes to login
+    if (isProtectedRoute) {
+      const url = new URL("/login", request.url);
+      url.searchParams.set("from", pathname);
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
-  // 4. If session exists and user is trying to access login, redirect to home
+  // 4. If token exists and user tries to access login, redirect to home
   if (isLoginPage) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -46,12 +58,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

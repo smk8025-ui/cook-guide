@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import HomeClient from "@/components/HomeClient";
+import { redirect } from "next/navigation";
 
 // Force dynamic rendering to ensure cookies/auth checks work correctly on every load
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   // Fetch top 3 recipes as recommended items
   const recommendedRecipes = await prisma.recipe.findMany({
@@ -15,7 +20,7 @@ export default async function Home() {
 
   return (
     <HomeClient
-      user={user ? { username: user.username } : null}
+      user={{ username: user.username, nickname: user.nickname }}
       recommendedRecipes={recommendedRecipes}
     />
   );

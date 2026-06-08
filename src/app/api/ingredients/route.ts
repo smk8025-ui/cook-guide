@@ -11,7 +11,6 @@ export async function GET() {
   try {
     const userIngredients = await prisma.userIngredient.findMany({
       where: { userId: session.userId },
-      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ ingredients: userIngredients.map(i => i.name) });
   } catch (error) {
@@ -88,10 +87,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "삭제할 재료명을 지정해주세요." }, { status: 400 });
     }
 
-    await prisma.userIngredient.deleteMany({
+    await prisma.userIngredient.delete({
       where: {
-        userId: session.userId,
-        name: name,
+        userId_name: {
+          userId: session.userId,
+          name: name,
+        },
       },
     });
 

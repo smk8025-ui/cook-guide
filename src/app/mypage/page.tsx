@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function MyPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [nickname, setNickname] = useState("");
   const [shoppingList, setShoppingList] = useState<string[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [toastMessage, setToastMessage] = useState("");
@@ -18,7 +19,11 @@ export default function MyPage() {
         const meData = await meRes.json();
         if (meData.user) {
           setUsername(meData.user.username);
+          setNickname(meData.user.nickname || meData.user.username);
         }
+      } else {
+        router.push("/login?from=/mypage");
+        return;
       }
 
       // Shopping list
@@ -96,7 +101,7 @@ export default function MyPage() {
             </div>
             <div>
               <h3 className="font-extrabold text-base text-brand-gray-900 dark:text-zinc-100">
-                {username || "사용자"}님
+                {nickname || username || "사용자"}님
               </h3>
               <p className="text-xs text-brand-gray-500 dark:text-brand-gray-400 mt-0.5">
                 냉털쿡 자취생 요리 회원

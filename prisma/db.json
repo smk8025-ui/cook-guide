@@ -1,5 +1,22 @@
 {
-  "users": [],
+  "users": [
+    {
+      "id": 1,
+      "username": "ssj825",
+      "password": "$2b$10$vlXCazmoO0TGgD30f38aS.9I6xPJ1KsjG/nz6vL8hEc7F/3UJ1fL2",
+      "nickname": "ssj825",
+      "createdAt": "2026-06-08T10:19:59.098Z",
+      "updatedAt": "2026-06-08T10:19:59.099Z"
+    },
+    {
+      "id": 2,
+      "username": "alsrb9671",
+      "password": "$2b$10$9l1/Fd7Us9JZ8/guz3AmEOBNAJjH0IxGmZcU0oLpBGxIlrJmaRLDa",
+      "nickname": "나봉이",
+      "createdAt": "2026-06-08T10:46:23.506Z",
+      "updatedAt": "2026-06-08T10:46:23.507Z"
+    }
+  ],
   "ingredients": [
     {
       "id": 1,
@@ -87,7 +104,38 @@
       "category": "양념"
     }
   ],
-  "userIngredients": [],
+  "userIngredients": [
+    {
+      "id": 1,
+      "userId": 1,
+      "name": "김치",
+      "createdAt": "2026-06-08T10:24:42.899Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "name": "당근",
+      "createdAt": "2026-06-08T10:24:45.298Z"
+    },
+    {
+      "id": 3,
+      "userId": 2,
+      "name": "김치",
+      "createdAt": "2026-06-08T10:47:10.226Z"
+    },
+    {
+      "id": 4,
+      "userId": 2,
+      "name": "계란",
+      "createdAt": "2026-06-08T10:47:10.228Z"
+    },
+    {
+      "id": 5,
+      "userId": 2,
+      "name": "대파",
+      "createdAt": "2026-06-08T10:47:10.233Z"
+    }
+  ],
   "recipes": [
     {
       "id": 1,
@@ -439,6 +487,76 @@
       "instruction": "마지막에 두부와 대파를 넣고 한소끔 더 끓여 완성한다."
     }
   ],
-  "bookmarks": [],
-  "shoppingLists": []
+  "bookmarks": [
+    {
+      "id": 1,
+      "userId": 2,
+      "recipeId": "gyeran-mari",
+      "createdAt": "2026-06-08T10:48:06.167Z"
+    }
+  ],
+  "shoppingLists": [
+    {
+      "id": 1,
+      "userId": 1,
+      "ingredientName": "묵은지",
+      "createdAt": "2026-06-08T10:21:27.723Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "ingredientName": "돼지고기 삼겹살",
+      "createdAt": "2026-06-08T10:21:27.726Z"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "ingredientName": "두부",
+      "createdAt": "2026-06-08T10:21:27.729Z"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "ingredientName": "대파",
+      "createdAt": "2026-06-08T10:21:27.731Z"
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "ingredientName": "다진마늘",
+      "createdAt": "2026-06-08T10:21:27.733Z"
+    },
+    {
+      "id": 6,
+      "userId": 1,
+      "ingredientName": "고춧가루",
+      "createdAt": "2026-06-08T10:21:27.735Z"
+    },
+    {
+      "id": 7,
+      "userId": 1,
+      "ingredientName": "국간장",
+      "createdAt": "2026-06-08T10:21:27.738Z"
+    },
+    {
+      "id": 8,
+      "userId": 1,
+      "ingredientName": "참기름",
+      "createdAt": "2026-06-08T10:21:27.740Z"
+    },
+    {
+      "id": 9,
+      "userId": 1,
+      "ingredientName": "물",
+      "createdAt": "2026-06-08T10:21:27.742Z"
+    }
+  ],
+  "recentSearches": [
+    {
+      "id": 1,
+      "userId": 1,
+      "query": "당근",
+      "createdAt": "2026-06-08T10:24:45.361Z"
+    }
+  ]
 }
