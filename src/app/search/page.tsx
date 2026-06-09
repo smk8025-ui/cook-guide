@@ -160,15 +160,29 @@ export default function SearchPage() {
   const deleteIngredient = async (name: string) => {
     try {
       const res = await fetch(`/api/ingredients?name=${encodeURIComponent(name)}`, { method: "DELETE" });
-      if (res.ok) loadData();
-    } catch (err) {}
+      if (res.ok) {
+        setIngredients((prev) => prev.filter((i) => i !== name));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        console.error("Delete ingredient failed:", res.status, data);
+        loadData();
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const clearAllIngredients = async () => {
     try {
       const res = await fetch("/api/ingredients?all=true", { method: "DELETE" });
-      if (res.ok) loadData();
-    } catch (err) {}
+      if (res.ok) {
+        setIngredients([]);
+      } else {
+        loadData();
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleRecommendClick = () => {
@@ -286,8 +300,12 @@ export default function SearchPage() {
                   <h3 className="text-xs font-bold text-brand-gray-400 uppercase tracking-wider">최근 검색한 재료</h3>
                   <button
                     onClick={async () => {
-                      await fetch("/api/recent-search", { method: "DELETE" });
-                      loadData();
+                      const res = await fetch("/api/recent-search", { method: "DELETE" });
+                      if (res.ok) {
+                        setRecentSearches([]);
+                      } else {
+                        loadData();
+                      }
                     }}
                     className="text-[11px] font-semibold text-brand-gray-400 hover:text-brand-danger"
                   >

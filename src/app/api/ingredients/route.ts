@@ -97,8 +97,13 @@ export async function DELETE(request: Request) {
     });
 
     return NextResponse.json({ success: true, message: `${name} 삭제 완료` });
-  } catch (error) {
+  } catch (error: any) {
+    // If the record doesn't exist, treat it as already deleted (idempotent delete)
+    if (error?.message?.includes("not found") || error?.code === "P2025") {
+      return NextResponse.json({ success: true, message: `${name} 이미 삭제됨` });
+    }
     console.error("DELETE ingredients error:", error);
     return NextResponse.json({ error: "재료를 삭제하지 못했습니다." }, { status: 500 });
   }
 }
+

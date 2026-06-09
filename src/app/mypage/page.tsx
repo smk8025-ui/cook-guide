@@ -66,10 +66,18 @@ export default function MyPage() {
         method: "DELETE",
       });
       if (res.ok) {
+        setShoppingList((prev) => prev.filter((item) => item !== name));
         triggerToast(`🗑️ ${name} 삭제 완료`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        console.error("Delete shopping item failed:", res.status, data);
+        triggerToast("❌ 삭제에 실패했습니다.");
         loadData();
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+      triggerToast("❌ 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const handleClearAll = async () => {
@@ -78,10 +86,15 @@ export default function MyPage() {
         method: "DELETE",
       });
       if (res.ok) {
+        setShoppingList([]);
         triggerToast("🗑️ 장보기 목록이 초기화되었습니다.");
+      } else {
+        triggerToast("❌ 초기화에 실패했습니다.");
         loadData();
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

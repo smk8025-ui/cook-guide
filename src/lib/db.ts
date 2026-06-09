@@ -205,7 +205,8 @@ export const prisma = {
         writeDb(db);
         return deleted;
       }
-      throw new Error("Record to delete not found.");
+      // Return null instead of throwing - record may have already been deleted
+      return null;
     },
     deleteMany: async (args?: { where?: { userId: number } }) => {
       const db = readDb();
@@ -389,7 +390,7 @@ export const prisma = {
         writeDb(db);
         return deleted;
       }
-      throw new Error("Record to delete not found.");
+      return null;
     },
     deleteMany: async (args?: any) => {
       const db = readDb();
@@ -443,7 +444,7 @@ export const prisma = {
         writeDb(db);
         return deleted;
       }
-      throw new Error("Record to delete not found.");
+      return null;
     },
     deleteMany: async (args?: { where?: { userId: number } }) => {
       const db = readDb();

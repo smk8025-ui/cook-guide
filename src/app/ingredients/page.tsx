@@ -170,16 +170,27 @@ function IngredientsContent() {
   const deleteIngredient = async (name: string) => {
     try {
       const res = await fetch(`/api/ingredients?name=${encodeURIComponent(name)}`, { method: "DELETE" });
-      if (res.ok) loadData();
+      if (res.ok) {
+        setIngredients((prev) => prev.filter((i) => i !== name));
+        triggerToast(`✅ ${name} 삭제 완료`);
+      } else {
+        triggerToast("❌ 삭제에 실패했습니다.");
+      }
     } catch (err) {
       console.error(err);
+      triggerToast("❌ 삭제 중 오류가 발생했습니다.");
     }
   };
 
   const clearAllIngredients = async () => {
     try {
       const res = await fetch("/api/ingredients?all=true", { method: "DELETE" });
-      if (res.ok) loadData();
+      if (res.ok) {
+        setIngredients([]);
+        triggerToast("✅ 전체 재료가 삭제되었습니다.");
+      } else {
+        triggerToast("❌ 전체 삭제에 실패했습니다.");
+      }
     } catch (err) {
       console.error(err);
     }
@@ -266,8 +277,12 @@ function IngredientsContent() {
               <h3 className="text-xs font-bold text-brand-gray-400 uppercase tracking-wider">최근 검색한 재료</h3>
               <button
                 onClick={async () => {
-                  await fetch("/api/recent-search", { method: "DELETE" });
-                  loadData();
+                  const res = await fetch("/api/recent-search", { method: "DELETE" });
+                  if (res.ok) {
+                    setRecentSearches([]);
+                  } else {
+                    loadData();
+                  }
                 }}
                 className="text-[11px] font-semibold text-brand-gray-400 hover:text-brand-danger"
               >
