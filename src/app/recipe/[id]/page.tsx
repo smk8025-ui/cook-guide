@@ -21,7 +21,15 @@ export default function RecipeDetailPage() {
   const [wakeLockSentinel, setWakeLockSentinel] = useState<any>(null);
 
   useEffect(() => {
-    const found = RECIPES.find((r) => r.id === recipeId);
+    const recipeIdMap: Record<string, string> = {
+      "1": "kimchi-fried-rice",
+      "2": "gyeran-mari",
+      "3": "jeyuk-bokkeum",
+      "4": "kimchi-stew",
+      "5": "doenjang-stew",
+    };
+    const targetId = recipeIdMap[recipeId] || recipeId;
+    const found = RECIPES.find((r) => r.id === targetId);
     if (found) {
       setRecipe(found);
     } else {

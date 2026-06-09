@@ -186,33 +186,45 @@ export default function HomeClient({ user, recommendedRecipes }: HomeClientProps
         </div>
 
         <div className="space-y-3.5">
-          {recommendedRecipes.map((recipe) => (
-            <Link
-              key={recipe.id}
-              href={`/recipe/${recipe.id}`}
-              className="flex items-center gap-4 p-3.5 rounded-xl border border-zinc-100 bg-white shadow-xs hover:border-brand-primary/20 dark:bg-zinc-900 dark:border-zinc-800/80 active-press transition-colors"
-            >
-              <div className="w-14 h-14 rounded-lg bg-zinc-100 flex items-center justify-center text-2xl dark:bg-zinc-800">
-                {recipe.name === "김치볶음밥" ? "🍛" : recipe.name === "계란말이" ? "🍳" : recipe.name === "김치찌개" ? "🍲" : recipe.name === "된장찌개" ? "🥣" : "🥘"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate">{recipe.name}</h4>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded dark:bg-zinc-800 dark:text-zinc-300">
-                    ⏱ {recipe.time}분
-                  </span>
-                  <span className="text-[10px] bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded">
-                    🔥 {recipe.difficulty}
-                  </span>
+          {recommendedRecipes.map((recipe) => {
+            const recipeIdMap: Record<string, string> = {
+              "김치볶음밥": "kimchi-fried-rice",
+              "계란말이": "gyeran-mari",
+              "제육덮밥": "jeyuk-bokkeum",
+              "제육볶음": "jeyuk-bokkeum",
+              "김치찌개": "kimchi-stew",
+              "된장찌개": "doenjang-stew",
+            };
+            const mappedId = recipeIdMap[recipe.name] || recipe.id.toString();
+
+            return (
+              <Link
+                key={recipe.id}
+                href={`/recipe/${mappedId}`}
+                className="flex items-center gap-4 p-3.5 rounded-xl border border-zinc-100 bg-white shadow-xs hover:border-brand-primary/20 dark:bg-zinc-900 dark:border-zinc-800/80 active-press transition-colors"
+              >
+                <div className="w-14 h-14 rounded-lg bg-zinc-100 flex items-center justify-center text-2xl dark:bg-zinc-800">
+                  {recipe.name === "김치볶음밥" ? "🍛" : recipe.name === "계란말이" ? "🍳" : recipe.name === "김치찌개" ? "🍲" : recipe.name === "된장찌개" ? "🥣" : "🥘"}
                 </div>
-              </div>
-              <div className="text-zinc-300 dark:text-zinc-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                </svg>
-              </div>
-            </Link>
-          ))}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-white truncate">{recipe.name}</h4>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded dark:bg-zinc-800 dark:text-zinc-300">
+                      ⏱ {recipe.time}분
+                    </span>
+                    <span className="text-[10px] bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded">
+                      🔥 {recipe.difficulty}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-zinc-300 dark:text-zinc-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

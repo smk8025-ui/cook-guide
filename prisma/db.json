@@ -573,6 +573,48 @@
       "userId": 2,
       "ingredientName": "물",
       "createdAt": "2026-06-08T23:48:55.070Z"
+    },
+    {
+      "id": 16,
+      "userId": 2,
+      "ingredientName": "신김치",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 17,
+      "userId": 2,
+      "ingredientName": "밥",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 18,
+      "userId": 2,
+      "ingredientName": "대파",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 19,
+      "userId": 2,
+      "ingredientName": "계란",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 20,
+      "userId": 2,
+      "ingredientName": "간장",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 21,
+      "userId": 2,
+      "ingredientName": "참기름",
+      "createdAt": "2026-06-09T00:14:02.689Z"
+    },
+    {
+      "id": 22,
+      "userId": 2,
+      "ingredientName": "식용유",
+      "createdAt": "2026-06-09T00:14:02.689Z"
     }
   ],
   "recentSearches": [
